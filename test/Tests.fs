@@ -1378,3 +1378,34 @@ testCase "Deserializing tuple of single case unions works in Fable 1 representat
         | Ok (AlbumId 5, AlbumAuthor "author") -> true
         | somethingElse -> false)
     |> test.equal true
+
+type TupleArrayCrazyness = {
+    Highlights: (string * string []) []
+}
+testCase "Deserializing (string * string [])" <| fun test ->
+    [
+        """
+        [
+			{
+				"Highlights": [
+					[
+						"key1",
+						[
+							"Text (<em>hi</em>)"
+						]
+					],
+					[
+						"key2",
+						[
+							"Text (<em>hi</em>)"
+						]
+					]
+				]
+            }
+        ]
+        """
+    ]
+    |> List.map Json.parseNativeAs<TupleArrayCrazyness[]>
+    |> List.forall (fun _ -> true)
+    |> test.equal true
+    
